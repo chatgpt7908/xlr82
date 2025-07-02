@@ -1,0 +1,11 @@
+1) Review the resources in the production project.
+
+2) Open a terminal on the workstation and log in to the OpenShift cluster as the developer user with the developer password.
+
+3) Export the Kubernetes resources from the production project and save them in the ~/DO380/labs/backup-export/production directory.
+
+4) Create a production directory ---> Export the persistent volume claim resource to a YAML file named 01-pvc.yml,Export the deployment resource to a YAML file named 02-deployment.yml,Export the service resource to a YAML file named 03-service.yml,Export the route resource to a YAML file named 04-route.yml
+
+5) As the admin user, expose the internal registry to enable users to export and import container images.
+
+6) As the developer user, export all container images that are referenced in the etherpad image stream and save them in the ~/DO380/labs/backup-export/production directory. Export all container images from the etherpad image stream 

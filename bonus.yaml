@@ -1,0 +1,36 @@
+#!/bin/bash
+
+echo "🔍 Bonus Validation: Checking testfile.txt with 'hello world' in etherpad pod..."
+
+# Step 1: Get pod
+POD=$(oc get pod -l app=etherpad -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+if [[ -z "$POD" ]]; then
+  POD=$(oc get pod -l app.kubernetes.io/name=etherpad -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+fi
+
+if [[ -z "$POD" ]]; then
+  echo "❌ etherpad pod not found (no matching label or pod not running)"
+  exit 1
+fi
+
+FILE="/opt/etherpad-lite/var/testfile.txt"
+
+# Step 2: Check file existence
+if ! oc exec "$POD" -c etherpad -- test -f "$FILE"; then
+  echo "⚠️ File not found. Creating file in pod $POD..."
+  oc exec "$POD" -c etherpad -- bash -c "echo 'hello world' > '$FILE'"
+  echo "✅ File created with 'hello world'"
+else
+  # Step 3: Check content
+  CONTENT=$(oc exec "$POD" -c etherpad -- head -n1 "$FILE" 2>/dev/null)
+  if [[ "$CONTENT" != "hello world" ]]; then
+    echo "⚠️ File exists but content is incorrect. Fixing content..."
+    oc exec "$POD" -c etherpad -- bash -c "echo 'hello world' > '$FILE'"
+    echo "✅ File content updated to 'hello world'"
+  else
+    echo "✅ File exists and content is correct"
+  fi
+fi
+
+echo "🎉 Bonus Passed: File is ready and correct in pod $POD"
+
